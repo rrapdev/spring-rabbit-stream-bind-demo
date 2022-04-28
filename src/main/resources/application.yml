@@ -1,0 +1,46 @@
+spring:
+  cloud:
+    function:
+      definition: paymentConsumer;arrecadationConsumer
+    stream:
+      rabbit:
+        default:
+          consumer:
+            queue-name-group-only: true
+        bindings:
+          arrecadationConsumer-in-0:
+            consumer:
+              bindingRoutingKey: arrecadation.key
+          paymentConsumer-in-0:
+            consumer:
+              bindingRoutingKey: payment.key
+
+      bindings:
+        paymentConsumer-in-0:
+          group: payment.queue
+          destination: amq.topic
+          binder: payment-consumer
+        arrecadationConsumer-in-0:
+          group: arrecadation.queue
+          destination: amq.topic
+          binder: arrecadation-consumer
+
+      binders:
+        arrecadation-consumer:
+          type: rabbit
+          environment:
+            spring.rabbitmq:
+              host: localhost
+              port: 5672
+              username: admin
+              password: 123456
+              virtual-host: virtualhost2
+        payment-consumer:
+          type: rabbit
+          environment:
+            spring.rabbitmq:
+              host: localhost
+              port: 5672
+              username: admin
+              password: 123456
+              virtual-host: virtualhost1
